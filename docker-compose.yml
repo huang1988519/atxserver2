@@ -13,5 +13,7 @@ services:
     # restart: on-failure
   rethinkdb:
     image: rethinkdb:2.3.6
+    ports:
+      - "28015:28015"
     volumes:
       - ./rethinkdb_data:/data
