@@ -56,12 +56,12 @@ class="container-fluid"
             </div>
         </div>
     </div>
-    <el-table :data="tableData">
+    <el-table :data="tableData" stripe >
         <!-- <el-table-column prop="udid" label="UDID"></el-table-column> -->
         <el-table-column label="操作">
             <template slot-scope="scope">
                 <template v-if='"offline" == scope.row.status'>
-                    <el-button size="mini" disabled>设备离线</el-button>
+                    <el-button size="mini" type="danger" disabled>设备离线</el-button>
                 </template>
                 <template v-else-if='"colding" == scope.row.status'>
                     <el-button disabled :loading="true" size="mini" type="primary">释放中</span>
@@ -79,8 +79,8 @@ class="container-fluid"
                 </template>
                 <template v-else>
                     <a :href='"/devices/"+scope.row.udid+"/remotecontrol"' target="_blank">
-                        <el-button size="mini">
-                            <span style="color: blue">点击使用</span>
+                        <el-button size="mini" type="primary">
+                            <span style="color: white">点击使用</span>
                         </el-button>
                     </a>
                 </template>
@@ -160,7 +160,7 @@ class="container-fluid"
     console.log(admin)
 </script>
 <script>
-    $.getJSON("/api/v1/devices?present=true")
+    $.getJSON("/api/v1/devices?online=true")
         .then((ret) => {
             new Vue({
                 el: "#app",

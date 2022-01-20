@@ -55,6 +55,11 @@ class APIDeviceListHandler(CorsMixin, BaseRequestHandler):
             reql = reql.filter(
                 {"present": self.get_argument("present") == "true"})
 
+        if self.get_argument('online', None):
+            reql = reql.filter(
+                {"online": self.get_argument("online") == "true"}
+            )
+
         reql = reql.order_by(r.desc("createdAt"))
         devices = await reql.all()
 
