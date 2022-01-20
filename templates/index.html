@@ -60,14 +60,19 @@ class="container-fluid"
         <!-- <el-table-column prop="udid" label="UDID"></el-table-column> -->
         <el-table-column label="操作">
             <template slot-scope="scope">
+                <el-popover
+                    placement="right-start"
+                    width="200"
+                    trigger="hover"
+                    :content="scope.row.userId">
                 <template v-if='"offline" == scope.row.status'>
-                    <el-button size="mini" type="danger" disabled>设备离线</el-button>
+                    <el-button size="normal" type="danger" slot="reference" disabled>设备离线</el-button>
                 </template>
                 <template v-else-if='"colding" == scope.row.status'>
-                    <el-button disabled :loading="true" size="mini" type="primary">释放中</span>
+                    <el-button disabled :loading="true" size="normal" slot="reference" type="primary">释放中</span>
                 </template>
                 <template v-else-if='"busy" == scope.row.status'>
-                    <el-button :title="scope.row.userId" style="cursor: not-allowed; background: #f3d19e" size="mini"
+                    <el-button :title="scope.row.userId" slot="reference" style="cursor: not-allowed; background: #f3d19e" size="normal"
                         type="warning">
                         <span @dblclick.alt="deviceRelease(scope.row.udid)">
                             <i class="fas fa-lock color-yellow" v-show="scope.row.private"></i> 已被占用
@@ -75,15 +80,16 @@ class="container-fluid"
                     </el-button>
                 </template>
                 <template v-else-if='"stop using" == scope.row.status'>
-                    <el-button @click="deviceRelease(scope.row.udid)" size="mini" type="danger">停用</el-button>
+                    <el-button @click="deviceRelease(scope.row.udid)" size="normal" slot="reference" type="danger">停用</el-button>
                 </template>
                 <template v-else>
                     <a :href='"/devices/"+scope.row.udid+"/remotecontrol"' target="_blank">
-                        <el-button size="mini" type="primary">
+                        <el-button size="normal" type="primary" slot="reference">
                             <span style="color: white">点击使用</span>
                         </el-button>
                     </a>
                 </template>
+            </el-popover>
             </template>
         </el-table-column>
         <el-table-column label="设备编号">
