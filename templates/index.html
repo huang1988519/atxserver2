@@ -34,7 +34,7 @@ class="container-fluid"
 {% block content %}
 <div class="container-fluid">
     <span onclick="location.reload()">
-        <el-alert v-if="websocketDisconnected" title="WebSocket连接断开，点击或F5刷新重连" type="error">
+        <el-alert style='margin-top: 20px' v-if="websocketDisconnected" title="WebSocket连接断开，点击或F5刷新重连" type="error" effect="dark" show-icon center>
         </el-alert>
     </span>
     <div class="row">
@@ -60,28 +60,30 @@ class="container-fluid"
         <!-- <el-table-column prop="udid" label="UDID"></el-table-column> -->
         <el-table-column label="操作">
             <template slot-scope="scope">
-                <el-popover
-                    placement="right-start"
-                    width="200"
-                    trigger="hover"
-                    :content="scope.row.userId">
+                
                 <template v-if='"offline" == scope.row.status'>
                     <el-button size="normal" type="danger" slot="reference" disabled>设备离线</el-button>
                 </template>
                 <template v-else-if='"colding" == scope.row.status'>
                     <el-button disabled :loading="true" size="normal" slot="reference" type="primary">释放中</span>
                 </template>
+                
                 <template v-else-if='"busy" == scope.row.status'>
-                    <el-button :title="scope.row.userId" slot="reference" style="cursor: not-allowed; background: #f3d19e" size="normal"
-                        type="warning">
-                        <span @dblclick.alt="deviceRelease(scope.row.udid)">
-                            <i class="fas fa-lock color-yellow" v-show="scope.row.private"></i> 已被占用
-                        </span>
-                    </el-button>
+                    <el-popover placement="right" :title="scope.row.userId" width="200" trigger='hover'>
+                        <el-button :title="scope.row.userId" slot="reference" style="cursor: not-allowed; background: #f3d19e" size="normal"
+                            type="warning">
+                            <span @dblclick.alt="deviceRelease(scope.row.udid)">
+                                <i class="fas fa-lock color-yellow" v-show="scope.row.private"></i> 已被占用
+                            </span>
+                        </el-button>
+                    </el-popover>
+
                 </template>
+                
                 <template v-else-if='"stop using" == scope.row.status'>
                     <el-button @click="deviceRelease(scope.row.udid)" size="normal" slot="reference" type="danger">停用</el-button>
                 </template>
+            
                 <template v-else>
                     <a slot="reference" :href='"/devices/"+scope.row.udid+"/remotecontrol"' target="_blank">
                         <el-button size="normal" type="primary" slot="reference">
@@ -89,7 +91,7 @@ class="container-fluid"
                         </el-button>
                     </a>
                 </template>
-            </el-popover>
+            
             </template>
         </el-table-column>
         <el-table-column label="设备编号">
@@ -152,6 +154,11 @@ class="container-fluid"
         <el-table-column sortable :sort-method="tableSortBy('usingDuration')" label="使用时长">
             <template slot-scope="scope">
                 {{!scope.row.usingDuration | formatDuration}}
+            </template>
+        </el-table-column>
+        <el-table-column label="Tags">
+            <template slot-scope="scope">
+                <el-button  class="button-new-tag" size="small" @click="showInput">+New Tag(待完成)</el-button>
             </template>
         </el-table-column>
     </el-table>
