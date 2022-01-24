@@ -44,6 +44,34 @@ class APIAdminListHandler(AdminRequestHandler):
             "success": True,
             "data": ret,
         })
+        
+    async def delete(self):
+        payload = self.get_payload()
+        ret = await db.table("users").get(payload["email"]).update({"admin": False}) # yapf: disable
+        self.write_json({
+            "success": True,
+            "data": ret,
+        })
+
+
+class APIUsersListHandler(AdminRequestHandler):
+    async def get(self):
+        """
+        Response example:
+        {
+            "success": true,
+            "users": [{
+                "email": "xxxxx@yyyyy",
+                "admin": true,
+                ...
+            }]
+        }
+        """
+        users = await db.table("users").filter({}).all()
+        self.write_json({
+            "success": True,
+            "users": users,
+        })
 
 
 class APIUserHandler(AuthRequestHandler):

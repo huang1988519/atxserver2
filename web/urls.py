@@ -15,7 +15,7 @@ from .views.group import (APIGroupUserListHandler, APIUserGroupListHandler,
 from .views.provider import ProviderHeartbeatWSHandler
 from .views.upload import UploadItemHandler, UploadListHandler
 from .views.user import (
-    AdminListHandler, APIAdminListHandler, APIUserHandler,
+    AdminListHandler, APIAdminListHandler,APIUsersListHandler, APIUserHandler,
     APIUserSettingsHandler, UserHandler)
 
 urlpatterns = [
@@ -47,6 +47,7 @@ urlpatterns = [
     (r"/api/v1/user/devices/([^/]+)/active", APIUserDeviceActiveHandler), # GET
     (r"/api/v1/user/settings", APIUserSettingsHandler), # GET, PUT
     (r"/api/v1/admins", APIAdminListHandler), # GET, POST
+    (r"/api/v1/users", APIUsersListHandler), # GET, POST
     ## Group API
     # (r"/api/v1/user/groups/([^/]+)", APIUserGroupHandler), # GET, POST, DELETE  TODO(ssx)
     (r"/api/v1/user/groups", APIUserGroupListHandler), # GET, POST

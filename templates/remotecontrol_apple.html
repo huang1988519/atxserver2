@@ -113,7 +113,7 @@
 {% end %}
 
 {% block nav %}
-<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-primary">
   <div class="container-fluid">
     <a class="navbar-brand" href="/">
       <span class="title">TYMobile</span></a>
@@ -126,16 +126,25 @@
         <!-- </a> -->
       </div>
       <div class="navbar-nav navbar-right ml-auto">
-        <div class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-            {{current_user.email}}
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="/user">用户信息</a>
-            <a class="dropdown-item" href="/logout">Logout</a>
-          </div>
-        </div>
+        <el-dropdown trigger='click' split-button>
+          <span class="el-icon-user">
+              {{current_user.username}}
+              <i class="el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+              {% if current_user.admin %}
+              <el-dropdown-item>
+                  <a class="dropdown-item" href="/admin"> 后台管理</a>
+              </el-dropdown-item>
+              {% end %}
+              <el-dropdown-item divided>
+                  <a class="dropdown-item" href="/user">用户信息</a>
+              </el-dropdown-item>
+              <el-dropdown-item>
+                  <a class="dropdown-item" href="/logout">Logout</a>
+              </el-dropdown-item>
+          </el-dropdown-menu>
+      </el-dropdown>
         <form class="form-inline">
           <button class="btn btn-warning" type="button" @click="stopUsing">停止使用</button>
           <span ref="usingTime" class="navbar-text" style="margin-left: 1em">

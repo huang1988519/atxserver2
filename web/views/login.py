@@ -34,12 +34,17 @@ class SimpleLoginHandler(BaseRequestHandler):
     def get(self):
         self.set_cookie("next", self.get_argument("next", "/"))
         self.write('<html><body><form action="/login" method="post">'
-                   'Name: <input type="text" name="name" required>'
-                   '<input type="submit" value="Sign in">'
+                   '<div>首次登陆，请联系@蛮僧 申请账号</div>'
+                   '<div>邮箱: <input type="text" name="name" required></div>'
+                   '<div>密码: <input type="text" name="pass" required></div>'
+                   '<div><input type="submit" value="Sign in"></div>'
                    '</form></body></html>')
 
     async def post(self):
+        import re
         name = self.get_argument("name")
+        pwd = self.get_argument("pass")
+        
         email = name + "@anonymous.com"
         await self.set_current_user(email, name)
         next_url = self.get_cookie("next", "/")
