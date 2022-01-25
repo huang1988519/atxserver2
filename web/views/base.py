@@ -54,6 +54,12 @@ class CurrentUserMixin(object):
         return self.bunchify(
             await db.table("users").get(id).run() if id else None)
 
+    async def get_user_exist(self, email: str):
+        users = await db.table("users").filter({
+            "email": email,
+        }).all()
+        return users
+    
     async def set_current_user(self, email: str, username: str):
         ret = await db.table("users").save({
             "email": email,

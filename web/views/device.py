@@ -30,7 +30,6 @@ class AcquireError(Exception):
 class ReleaseError(Exception):
     pass
 
-
 class APIDeviceListHandler(CorsMixin, BaseRequestHandler):
     async def get(self):
         def filter_accessible(v):  # filter out private device

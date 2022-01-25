@@ -6,4 +6,4 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 
 ENTRYPOINT [ "bash", "scripts/wait-for-db.sh" ]
-CMD ["python", "-u", "main.py"]
+CMD ["python", "-u", "main.py",'--auth','sso']

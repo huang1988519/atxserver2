@@ -27,7 +27,8 @@
             <el-table
             :data="users"
             border stripe
-            style="width: 100%;"
+            style="width: 100%; "
+            max-height="600"
             >
             <el-table-column  label='管理员' width='90'>
                 <template slot-scope="scope" v-if= "scope.row">
@@ -35,11 +36,11 @@
                     <i class="el-icon-user" v-if="scope.row.admin == true"></i>
                 </template>
             </el-table-column>
-            <el-table-column  prop='email' label='邮箱' sortable></el-table-column>
+            <el-table-column  prop='email' label='邮箱' sortable width='280'></el-table-column>
             <el-table-column  prop='username' label='用户名' sortable></el-table-column>
-            <el-table-column  prop='createdAt' label='创建日期' sortable></el-table-column>
+            <el-table-column  prop='createdAt' label='创建日期' sortable width='280'></el-table-column>
             <el-table-column  prop='token' label='Token' sortable width='320'></el-table-column>
-            <el-table-column  prop='lastLoggedInAt' label='上次登录' sortable></el-table-column>
+            <el-table-column  prop='lastLoggedInAt' label='上次登录' sortable width='280'></el-table-column>
             <el-table-column fixed='right' label='操作' width='150'>
                 <template slot-scope="scope">
                     <el-button v-if="scope.row.admin == true"

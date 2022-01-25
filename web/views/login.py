@@ -34,18 +34,22 @@ class SimpleLoginHandler(BaseRequestHandler):
     def get(self):
         self.set_cookie("next", self.get_argument("next", "/"))
         self.write('<html><body><form action="/login" method="post">'
-                   '<div>首次登陆，请联系@蛮僧 申请账号</div>'
-                   '<div>邮箱: <input type="text" name="name" required></div>'
-                   '<div>密码: <input type="text" name="pass" required></div>'
+                   '<div>首次登陆，请联系@蛮僧</div>'
+                   '<div><input type="text" name="name" required placeholder="用户名(必填)"></div>'
+                   '<div><input type="text" name="email" placeholder="邮箱"></div>'
                    '<div><input type="submit" value="Sign in"></div>'
                    '</form></body></html>')
 
     async def post(self):
-        import re
         name = self.get_argument("name")
-        pwd = self.get_argument("pass")
+        email = self.get_argument('email', name+"@anonymous.com",strip=True)
         
-        email = name + "@anonymous.com"
+        if email.strip() == '':
+            email = name+"@anonymous.com"
+            
+        logger.info(name)     
+        logger.info(email)        
+        
         await self.set_current_user(email, name)
         next_url = self.get_cookie("next", "/")
         self.clear_cookie("next")
@@ -81,3 +85,61 @@ class GithubLoginHandler(BaseRequestHandler, GithubOAuth2Mixin):
                 scope=['user'],
                 response_type='code',
                 extra_params={'approval_prompt': 'auto'})
+
+
+class TuyaSSOLoginHandler(BaseRequestHandler):
+    async def get(self):
+        self.set_cookie("next", self.get_argument("next", "/"))
+        self.write('<html><body><form action="/login" method="post">'
+                   '<h3>首次登陆</h3>'
+                   '<div"><input type="text" name="sso" required placeholder="请输入SSO"><input type="submit" value="提交"></div>'
+                   '</form>'
+                   '<h4>旧版登陆</h4>'
+                   '<form action="/login" method="post">'
+                   '<div></div>'
+                   '<div"><input type="text" name="name" required placeholder="用户名（必填）">'
+                   '<div"><input type="text" name="email" placeholder="邮箱">'
+                   '<input type="submit" value="提交"></div>'
+                   '</form>'
+                   '</body></html>')
+    
+    async def post(self):
+        sso = self.get_argument("sso",None)
+        if sso:
+            logger.info(sso)
+        
+            import requests
+            response = requests.get(
+                "https://login-cn.tuya-inc.com:7799/getLoginUser.sso",
+                headers={"Cookie": "SSO_USER_TOKEN=" + sso}
+            )
+            response.raise_for_status()
+
+            ret_json = response.json()
+            logger.info(ret_json)
+
+            if ret_json['result']['isLogin']:
+                user = ret_json['result']['user']
+                email = user['email']
+                name = user['nick']
+            else:
+                self.write(response.text)
+                return 
+        
+        else:
+            name = self.get_argument("name")
+            email = self.get_argument('email',None)
+        
+            if not email:
+                email = name+"@tuya.com"
+            
+            users = await self.get_user_exist(email)
+            if len(users)<=0:
+                self.write('首次登陆，请使用sso注册')
+                return 
+            
+        await self.set_current_user(email, name)
+        next_url = self.get_cookie("next", "/")
+        self.clear_cookie("next")
+        self.redirect(next_url)
+       
