@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}设备列表{% end %}
-
+{%block nav_container_class%}
+class="container-fluid"
+{%end%}
 {% block script %}
 {% end %}
 {% block style %}
@@ -18,7 +20,7 @@
 {% end %}
 
 {% block content %}
-<div class="container">
+<div class="container-fluid">
     <h3>文件上传</h3>
     <el-upload ref="upload" class="upload-demo" drag action="/uploads" :on-success="onUpload" multiple>
         <i class="el-icon-upload"></i>

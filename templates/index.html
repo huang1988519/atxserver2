@@ -58,13 +58,24 @@ class="container-fluid"
     </div>
     <el-table :data="tableData">
         <!-- <el-table-column prop="udid" label="UDID"></el-table-column> -->
+<<<<<<< Updated upstream
         <el-table-column label="操作">
+=======
+        <el-table-column label="操作" fixed="right" width='200'>
+>>>>>>> Stashed changes
             <template slot-scope="scope">
                 <template v-if='"offline" == scope.row.status'>
+<<<<<<< Updated upstream
                     <el-button size="mini" disabled>设备离线</el-button>
                 </template>
                 <template v-else-if='"colding" == scope.row.status'>
                     <el-button disabled :loading="true" size="mini" type="primary">释放中</span>
+=======
+                    <el-button size="mini" type="danger" slot="reference" disabled>设备离线</el-button>
+                </template>
+                <template v-else-if='"colding" == scope.row.status'>
+                    <el-button disabled :loading="true" size="mini" slot="reference" type="primary">释放中</span>
+>>>>>>> Stashed changes
                 </template>
                 <template v-else-if='"busy" == scope.row.status'>
                     <el-button :title="scope.row.userId" style="cursor: not-allowed; background: #f3d19e" size="mini"
@@ -84,6 +95,10 @@ class="container-fluid"
                         </el-button>
                     </a>
                 </template>
+<<<<<<< Updated upstream
+=======
+                <el-button size='mini' type='primary'>Agent</el-button>
+>>>>>>> Stashed changes
             </template>
         </el-table-column>
         <el-table-column label="设备编号">
