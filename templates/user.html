@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}用户详情{% end %}
-
+{%block nav_container_class%}
+class="container-fluid"
+{%end%}
 {% block script %}
 {% end %}
 {% block style %}
@@ -24,7 +26,7 @@
 {% end %}
 
 {% block content %}
-<div class="container">
+<div class="container-fluid">
     <div style="margin-top: 10px">
         <div>
             <dl>

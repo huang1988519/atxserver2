@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block title %}用户详情{% end %}
-
+{%block nav_container_class%}
+class="container-fluid"
+{%end%}
 {% block script %}
 {% end %}
 {% block style %}
@@ -9,7 +11,7 @@
 
 
 {% block content %}
-<div class="container">
+<div class="container-fluid">
     <div style="margin: 20px 0px; ">
         管理员接口: <a href="/api/v1/admins">/api/v1/admins</a>
         所有用户接口: <a href="/api/v1/admins">/api/v1/users</a>

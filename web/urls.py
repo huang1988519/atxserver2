@@ -14,6 +14,7 @@ from .views.group import (APIGroupUserListHandler, APIUserGroupListHandler,
                           UserGroupCreateHandler)
 from .views.provider import ProviderHeartbeatWSHandler
 from .views.upload import UploadItemHandler, UploadListHandler
+from .views.agent import AgentsListHandler,APIAgentHandler
 from .views.user import (
     AdminListHandler, APIAdminListHandler,APIUsersListHandler, APIUserHandler,
     APIUserSettingsHandler, UserHandler)
@@ -28,6 +29,7 @@ urlpatterns = [
     (r"/uploads/(.*)", UploadItemHandler, {
         'path': os.path.join(os.getcwd(), 'uploads')
     }),
+    (r"/agents", AgentsListHandler),
     (r"/apples", AppleDeviceListHandler),
     (r"/devices", DeviceListHandler),
     (r"/devices/([^/]+)", DeviceItemHandler),
@@ -52,6 +54,7 @@ urlpatterns = [
     # (r"/api/v1/user/groups/([^/]+)", APIUserGroupHandler), # GET, POST, DELETE  TODO(ssx)
     (r"/api/v1/user/groups", APIUserGroupListHandler), # GET, POST
     (r"/api/v1/groups/([^/]+)/users", APIGroupUserListHandler), # GET, TODO(POST)
+    (r"/api/v1/agent", APIAgentHandler), # GET, POST
     # GET /api/v1/devices
     # POST /api/v1/user/devices/{serial}/remoteConnect
     # DELETE /api/v1/user/devices/{serial}/remoteConnect

@@ -28,6 +28,10 @@ class DB(object):
         "groups": {
             "name": "groups",
         },
+        "agents": {
+            "name": "agents",
+            "primary_key": "aid"
+        },
     }
 
     def __init__(self, db='demo', **kwargs):
@@ -53,13 +57,15 @@ class DB(object):
 
         # init databases here
         safe_run(r.db_create(self.__dbname))
-
+        
         rdb = r.db(self.__dbname)
+        # safe_run(rdb.table_drop('agents'))
         for tbl in self.__tables.values():
             table_name = tbl['name']
             primary_key = tbl.get('primary_key', 'id')
             safe_run(rdb.table_create(table_name, primary_key=primary_key))
-
+        
+        
         # reset database
         safe_run(rdb.table("users").index_create("token"))
         safe_run(rdb.table("devices").replace(lambda q: q.without("sources")))
@@ -233,6 +239,7 @@ class TableHelper(object):
         data['createdAt'] = time_now()
 
         ret = await self.insert(data)
+        print(ret)
         assert ret['errors'] == 0
 
         if "generated_keys" in ret:
