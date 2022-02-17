@@ -4,6 +4,7 @@
 from tornado.web import authenticated
 from rethinkdb import r
 from logzero import logger
+from six.moves.urllib.parse import urlencode
 
 from ..database import db, time_now
 from .base import AuthRequestHandler, AdminRequestHandler
@@ -60,15 +61,26 @@ class TJenkins(object):
         node_dict.update(kwargs)
         # 使用jenkinsapi创建node， 使用 jenkins 创建是会失败
         logger.info(node_dict)
-        if self.japi.has_node(nodename):
-            self.japi.delete_node(nodename)
         
         from jenkinsapi import node
         node = node.Node(self.japi.get_jenkins_obj(),None, nodename=nodename, node_dict= node_dict)
         config = node.get_node_attributes()
         logger.info(config)
-        self.japi.create_node_with_config(nodename,config=config)
-                
+        
+        if self.japi.has_node(nodename):
+            jobj = self.japi.nodes.jenkins
+            url = ('%s/computer/doCreateItem?%s'
+               % (jobj.baseurl,
+                  urlencode(config)))
+            data = {'json': urlencode(config)}
+            
+            auth = requests.auth.HTTPBasicAuth(jenkins_name.encode('utf-8'), jenkins_token.encode('utf-8'))
+            res = requests.post(url,data=data,auth = auth)
+            logger.info(res)
+        else:
+            self.japi.create_node_with_config(nodename,config=config)
+    
+        
         token = self.fetch_token(nodename)
         await db.table("agents").filter({'name':nodename}).update({'token':token,'labels':node_dict['labels']})
     
