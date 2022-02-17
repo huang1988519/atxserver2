@@ -27,37 +27,34 @@ class="container-fluid"
 <div class="container-fluid">
     {% if current_user.admin %}
     <div style="margin: 20px;display: flex;justify-content:flex-end;">
-        <el-button type="primary" @click="dialogFormVisible = true">添加</el-button>
+        <el-button type="primary" @click="addAgent">添加</el-button>
     </div>
     {% end %}
     
     <el-dialog title="添加Agent" :visible="dialogFormVisible" :before-close="handleClose">
         <el-form ref="form" :model="agent" label-width="100px">
-            <el-form-item label="名称" :rules="[{ required: true, message: '不能为空'}]">
-                <el-input v-model="agent.name"></el-input>
-            </el-form-item>
-            <el-form-item label="Agent地址" :rules="[{ required: true, message: '不能为空'}]">
+            <el-form-item label="Agent地址">
                 <el-input v-model="agent.addr"></el-input>
             </el-form-item>
-            <el-form-item label="Token" :rules="[{ required: true, message: '不能为空'}]">
-                <el-input v-model="agent.token"></el-input>
+            <el-form-item label="Token">
+                <el-input v-model="agent.token" :disabled="true" placeholder="jenkins 链接token"></el-input>
             </el-form-item>
-            <el-form-item label="执行器数量"
-                :rules="[{ required: true, message: '不能为空'},{ type: 'number', message: '必须为数字值'}]">
-                <el-input v-model="agent.execute_num"></el-input>
-            </el-form-item>
+            <!-- <el-form-item label="执行器数量"
+                :rules="[{ type: 'number', message: '必须为数字值'}]">
+                <el-input v-model="agent.execute_num" :disabled="true"></el-input>
+            </el-form-item> -->
             <el-form-item label="描述" :rules="[{ required: true, message: '不能为空'}]">
                 <el-input v-model="agent.desc"></el-input>
             </el-form-item>
             <el-form-item label="设备" :rules="[{ required: true, message: '不能为空'}]">
-                <el-select style="width: 100%;" v-model="agent.device" placeholder="请选择">
+                <el-select style="width: 100%;" v-model="agent.udid" placeholder="请选择">
                     <el-option v-for="item in devices" :key="item.udid" :label="item.platform + '::' +  item.udid"
                         :value="item.udid">
                     </el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="启动参数">
-                <el-input v-model="agent.launch_params"></el-input>
+            <el-form-item label="Tags">
+                <el-input v-model="agent.tags" placeholder= '空格分隔'></el-input>
             </el-form-item>
 
         </el-form>
@@ -66,12 +63,15 @@ class="container-fluid"
             <el-button type="primary" @click="handlerSave">确定</el-button>
         </div>
     </el-dialog>
-
+    <el-empty v-if="agents.length<=0" description="暂无数据" style="display: flex;justify-content: center;align-items: center; "></el-empty>
     <div style="display: flex;flex-wrap: wrap;justify-content:flex-start;width:100%;">
+        
         <el-card class="box-card" v-for="(agent,index) in agents">
-            <el-descriptions :title="agent.device" border :column="3">
+            <el-descriptions :title="agent.name" border :column="3">
                 {% if current_user.admin %}
                 <template slot="extra">
+                    <el-button type="info" size="small" icon="el-icon-document-copy" @click="">启动命令</el-button>
+                    <el-button type="success" size="small" @click="synJenkins(agent)">同步</el-button>
                     <el-button type="danger" size="small" @click="deleteAgent(agent)">删除</el-button>
                     <el-button type="primary" size="small" @click="editAgent(agent)">编辑</el-button>
                 </template>
@@ -109,15 +109,15 @@ class="container-fluid"
                 data: Object.assign({
                     dialogFormVisible: false,
                     devices: [],
-                    agent: {
-                        device: null,
-                        name: "默认名称",
-                        addr:'http://172.16.246.89:8080/',
+                    default_agent: {
+                        udid: null,
+                        name: "自动生成",
+                        addr:null,
                         token: null,
-                        execute_num: 1,
-                        desc: "描述",
-                        launch_params: '{}'
+                        desc: "默认描述",
+                        tags: null
                     },
+                    agent: {},
                     token: "",
                     agents: null,
                 }, { "agents": ret.agents }),
@@ -133,6 +133,24 @@ class="container-fluid"
                             })
                             .catch(_ => { });
                     },
+                    synJenkins(agent) {
+                        $.post("/api/v1/jenkins", agent)
+                            .then((ret) => {
+                                console.log(ret);
+                                if(ret['success'] === true) {
+                                    location.reload()
+                                    return 
+                                }
+                                this.$notify({
+                                    title: '错误',
+                                    message: ret['msg']
+                                  });
+                            })
+                    },
+                    addAgent(agent) {
+                        this.agent = this.default_agent;
+                        this.dialogFormVisible = true;
+                    },
                     editAgent(agent) {
                         console.log(agent);
                         this.agent = agent;
@@ -140,8 +158,9 @@ class="container-fluid"
                     },
                     handlerSave(agent, method) {
                         this.dialogFormVisible = false;
-
-                        $.post("/api/v1/agent", this.agent)
+                        if(!this.agent.createdAt) {
+                            console.log('新建agent')
+                            $.post("/api/v1/agent", this.agent)
                             .then((ret) => {
                                 console.log(ret);
                                 const h = this.$createElement;
@@ -154,6 +173,19 @@ class="container-fluid"
                                     message: ret['msg']
                                   });
                             })
+                        }else {
+                            console.log('修改agent')
+                            $.ajax({
+                                url: '/api/v1/agent',
+                                data: this.agent,
+                                type: 'PUT',
+                                success: function(result) {
+                                    console.log(result);
+                                    location.reload()
+                                }
+                            });
+                        }
+                        
                     },
                     deleteAgent(agent) {
                         console.log(agent)
@@ -163,8 +195,12 @@ class="container-fluid"
                             data: agent,
                             success: function (ret) {
                                 console.log(ret);
+                                location.reload()
                             }
                         })
+                    },
+                    copyToClipboard() {
+                        navigator.clipboard.writeText("")
                     },
                     fetch() {
                         $.getJSON("/api/v1/devices")

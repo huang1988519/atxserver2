@@ -30,7 +30,7 @@ class DB(object):
         },
         "agents": {
             "name": "agents",
-            "primary_key": "aid"
+            "primary_key": "udid"
         },
     }
 

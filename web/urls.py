@@ -14,7 +14,7 @@ from .views.group import (APIGroupUserListHandler, APIUserGroupListHandler,
                           UserGroupCreateHandler)
 from .views.provider import ProviderHeartbeatWSHandler
 from .views.upload import UploadItemHandler, UploadListHandler
-from .views.agent import AgentsListHandler,APIAgentHandler
+from .views.agent import AgentsListHandler,APIAgentHandler,APIJenkinsHandler
 from .views.user import (
     AdminListHandler, APIAdminListHandler,APIUsersListHandler, APIUserHandler,
     APIUserSettingsHandler, UserHandler)
@@ -55,6 +55,7 @@ urlpatterns = [
     (r"/api/v1/user/groups", APIUserGroupListHandler), # GET, POST
     (r"/api/v1/groups/([^/]+)/users", APIGroupUserListHandler), # GET, TODO(POST)
     (r"/api/v1/agent", APIAgentHandler), # GET, POST
+    (r"/api/v1/jenkins", APIJenkinsHandler), # POST
     # GET /api/v1/devices
     # POST /api/v1/user/devices/{serial}/remoteConnect
     # DELETE /api/v1/user/devices/{serial}/remoteConnect
