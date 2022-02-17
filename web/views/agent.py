@@ -9,7 +9,7 @@ from six.moves.urllib.parse import urlencode
 from ..database import db, time_now
 from .base import AuthRequestHandler, AdminRequestHandler
 
-import os,requests
+import os,requests,re
 import jenkins
 from jenkinsapi.jenkins import Jenkins
 
@@ -47,7 +47,6 @@ def get_token_forurl(url):
 class TJenkins(object):
     def __init__(self):
         self.japi : Jenkins = Jenkins(jenkins_url,username=jenkins_name,password=jenkins_token,lazy=True)
-        self.J :jenkins.Jenkins = jenkins.Jenkins(jenkins_url,username=jenkins_name,password=jenkins_token)
         pass
     
     async def create(self,nodename,labels=[],**kwargs):
@@ -62,24 +61,23 @@ class TJenkins(object):
         # 使用jenkinsapi创建node， 使用 jenkins 创建是会失败
         logger.info(node_dict)
         
-        from jenkinsapi import node
-        node = node.Node(self.japi.get_jenkins_obj(),None, nodename=nodename, node_dict= node_dict)
-        config = node.get_node_attributes()
-        logger.info(config)
+        
         
         if self.japi.has_node(nodename):
-            jobj = self.japi.nodes.jenkins
-            url = ('%s/computer/doCreateItem?%s'
-               % (jobj.baseurl,
-                  urlencode(config)))
-            data = {'json': urlencode(config)}
-            
-            auth = requests.auth.HTTPBasicAuth(jenkins_name.encode('utf-8'), jenkins_token.encode('utf-8'))
-            res = requests.post(url,data=data,auth = auth)
-            logger.info(res)
+            J = jenkins.Jenkins(jenkins_url,username=jenkins_name,password=jenkins_token)
+            xml = J.get_node_config(nodename)
+            logger.info(xml)
+            xml = re.sub(r'(?<=<label>).+(?=</label>)', node_dict['labels'],xml)
+            logger.info(xml)
+            xml = re.sub(r'(?<=<description>).+(?=</description>)', node_dict.pop('node_description'),xml)
+            logger.info(xml)
+            J.reconfig_node(nodename, xml)
         else:
+            from jenkinsapi import node
+            node = node.Node(self.japi.get_jenkins_obj(),None, nodename=nodename, node_dict= node_dict)
+            config = node.get_node_attributes()
+            logger.info(config)
             self.japi.create_node_with_config(nodename,config=config)
-    
         
         token = self.fetch_token(nodename)
         await db.table("agents").filter({'name':nodename}).update({'token':token,'labels':node_dict['labels']})
