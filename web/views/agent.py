@@ -55,7 +55,7 @@ class TJenkins(object):
             'node_description': kwargs.pop('desc'),
             'remote_fs': nodename,
             'labels': ' '.join(labels),
-            'exclusive': False
+            'exclusive': True
         }
         node_dict.update(kwargs)
         # 使用jenkinsapi创建node， 使用 jenkins 创建是会失败
