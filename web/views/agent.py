@@ -78,7 +78,7 @@ class TJenkins(object):
             config = node.get_node_attributes()
             logger.info(config)
             self.japi.create_node_with_config(nodename,config=config)
-        
+                    
         token = self.fetch_token(nodename)
         await db.table("agents").filter({'name':nodename}).update({'token':token,'labels':node_dict['labels']})
     

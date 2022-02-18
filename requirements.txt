@@ -7,3 +7,4 @@ apkutils2>=1.0.0
 rethinkdb==2.4.2.post1
 jenkinsapi==0.3.11
 python-jenkins==1.7.0
+beautifulsoup4

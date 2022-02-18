@@ -21,7 +21,7 @@ from ..libs import jsondate
 from ..version import __version__
 from .base import (AuthRequestHandler, BaseRequestHandler,
                    BaseWebSocketHandler, CorsMixin)
-
+from ..jenkins_helper import TJenkins
 
 class AcquireError(Exception):
     pass
@@ -66,6 +66,13 @@ class APIDeviceListHandler(CorsMixin, BaseRequestHandler):
             present = self.get_argument("present") == "true"
             devices = [d for d in devices if d['present'] == present]
 
+        lock_resource = TJenkins.lock_resource()
+        for d in devices:
+            for ld in lock_resource:
+                if ld['name'] == d['udid']:
+                    d['using'] = True
+                    d['owner'] = ld['owner']
+                    
         self.write_json({
             "success": True,
             "devices": devices,
