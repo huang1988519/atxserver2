@@ -66,13 +66,7 @@ class APIDeviceListHandler(CorsMixin, BaseRequestHandler):
             present = self.get_argument("present") == "true"
             devices = [d for d in devices if d['present'] == present]
 
-        lock_resource = TJenkins.lock_resource()
-        for d in devices:
-            for ld in lock_resource:
-                if ld['name'] == d['udid']:
-                    d['using'] = True
-                    d['owner'] = ld['owner']
-                    
+             
         self.write_json({
             "success": True,
             "devices": devices,
@@ -231,6 +225,7 @@ class APIUserDeviceHandler(CorsMixin, AuthRequestHandler):
         udid = data["udid"]
         idle_timeout = data.get('idleTimeout', 600)  # 默认10分钟
         email = self.current_user.email
+        task = data.get('task',None)
 
         # Admin: change user email
         if data.get("email"):
@@ -243,7 +238,7 @@ class APIUserDeviceHandler(CorsMixin, AuthRequestHandler):
                         self.current_user.email, email)
 
         try:
-            await D(udid).acquire(email, idle_timeout)
+            await D(udid).acquire(email, idle_timeout,task=task)
             self.write_json({
                 "success": True,
                 "description": "Device successfully added"
@@ -387,7 +382,7 @@ class D(object):
     async def update(self, data: dict):
         return await db.table("devices").get(self.udid).update(data)
 
-    async def acquire(self, email: str, idle_timeout: int = 20 * 60):
+    async def acquire(self, email: str, idle_timeout: int = 20 * 60,task=None):
         """
         Raises:
             AcquireError
@@ -405,7 +400,7 @@ class D(object):
         if device.get("colding"):  # 冷却中
             raise AcquireError("device is colding")
 
-        ret = await db.table("devices").get(self.udid).update({"using": True})
+        ret = await db.table("devices").get(self.udid).update({"using": True,'task':task})
         if ret['skipped'] == 1:  # 被其他人占用了
             raise AcquireError(
                 "not fast enough, device have been taken from others")

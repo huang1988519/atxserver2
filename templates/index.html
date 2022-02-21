@@ -69,19 +69,24 @@ class="container-fluid"
                 </template>
                 
                 <template v-else-if='"busy" == scope.row.status'>
-                    <el-popover placement="right" :title="scope.row.userId" width="200" trigger='hover'>
-                        <el-button :title="scope.row.userId" slot="reference" style="cursor: not-allowed; background: #f3d19e" size="normal"
+                    <el-tooltip :content="scope.row.task" placement="right">
+                        <el-button :title="scope.row.userId"  style="cursor: not-allowed; background: #f3d19e" size="normal"
                             type="warning">
                             <span @dblclick.alt="deviceRelease(scope.row.udid)">
                                 <i class="fas fa-lock color-yellow" v-show="scope.row.private"></i> 已被占用
                             </span>
                         </el-button>
+                    </el-tooltip>
+                    <el-popover placement="right" :title="scope.row.userId" width="200" trigger='hover'>
+                        
                     </el-popover>
 
                 </template>
                 
                 <template v-else-if='"stop using" == scope.row.status'>
-                    <el-button @click="deviceRelease(scope.row.udid)" size="normal" slot="reference" type="danger">停用</el-button>
+                    <el-tooltip :content="scope.row.task" placement="right">
+                        <el-button @click="deviceRelease(scope.row.udid)" size="normal" type="danger">停用</el-button>
+                    </el-tooltip>
                 </template>
             
                 <template v-else>
@@ -102,9 +107,12 @@ class="container-fluid"
                         target="_blank">{{!(scope.row.prop_serial || scope.row.udid) | shortString}}</a>
                 </template>
                 <template v-else>
-                    <span style="font-family: 'Courier New'" :title="scope.row.prop_serial || scope.row.udid">
-                        {{!(scope.row.prop_serial || scope.row.udid) | shortString}}
-                    </span>
+                    <el-tooltip :content="scope.row.udid" placement="top">
+                        <span style="font-family: 'Courier New'" :title="scope.row.prop_serial || scope.row.udid">
+                            {{!(scope.row.prop_serial || scope.row.udid) | shortString}}
+                        </span>
+                    </el-tooltip>
+                    
                 </template>
             </template>
         </el-table-column>
